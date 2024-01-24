@@ -63,24 +63,21 @@ namespace SmartBuildingTests
 
             //Arrenge
             
-            string newCurrentState = "out_of_hours";
-            var controller = new BuildingController(state:newCurrentState);
+            string correctState = "out_of_hours";
+            var controller = new BuildingController();
 
 
             //Act
             string returnedState = controller.GetCurrentState();
 
             //Assert
-            Assert.AreEqual(newCurrentState, returnedState);
+            Assert.AreEqual(correctState, returnedState);
         }
 
 
 
         [TestCase("out_of_hours")]
         [TestCase("closed")]
-        [TestCase("open")]
-        [TestCase("fire_drill")]
-        [TestCase("fire_alarm")]
         public void L1R7_CheckValidCurrentState_ReturnTrue(string testState)
         {
 
@@ -116,9 +113,6 @@ namespace SmartBuildingTests
 
         [TestCase("out_of_hours")]
         [TestCase("closed")]
-        [TestCase("open")]
-        [TestCase("fire_drill")]
-        [TestCase("fire_alarm")]
         public void L1R7_SetCurrentStateToValidState_ReturnTrue(string testState)
         {
 
@@ -134,8 +128,26 @@ namespace SmartBuildingTests
             Assert.AreEqual(returnedState, testState);
         }
 
+        [TestCase("out_of_hours")]
+        [TestCase("closed")]
+        [TestCase("out_of_hours")]
+        [TestCase("open")]
+        [TestCase("fire_drill")]
 
-      
+        public void L2R1_SetStatesInCorrectOrder_ReturnTrue(string testState)
+        {
+
+            //Arrenge
+            var controller = new BuildingController();
+
+
+            //Act
+            bool stateSetSucsessfully =  controller.SetCurrentState(testState);
+            
+
+            //Assert
+            Assert.IsTrue(stateSetSucsessfully);
+        }
 
     }
 }

@@ -5,10 +5,10 @@
 
         string buildingID;
         string currentState;
-        string[] validStates = { "open", "closed", "out_of_hours", "fire_drill", "fire_alarm" };
+        string[] validStates = { "fire_drill", "open", "out_of_hours", "closed", "fire_alarm" };
 
 
-        public BuildingController(string buildingID = "", string state = "")
+        public BuildingController(string buildingID = "", string state = "out_of_hours")
         {
             this.buildingID = buildingID.ToLower();
             this.currentState = state.ToLower();
