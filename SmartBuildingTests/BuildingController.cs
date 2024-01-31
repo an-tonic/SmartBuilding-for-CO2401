@@ -8,6 +8,7 @@ namespace SmartBuilding
         string buildingID;
         string currentState;
         string[] validStates = { "fire_drill", "open", "out_of_hours", "closed", "fire_alarm" };
+        string[] validInitialStates = { "open", "out_of_hours", "closed" };
 
         public BuildingController()
         {
@@ -21,11 +22,19 @@ namespace SmartBuilding
             this.currentState = "out_of_hours";
         }
 
-        //public BuildingController(string buildingID = "", string state = "out_of_hours")
-        //{
-        //    this.buildingID = buildingID.ToLower();
-        //    this.currentState = state.ToLower();
-        //}
+        public BuildingController(string buildingID, string startState)
+        {
+            this.buildingID = buildingID.ToLower();
+            startState = startState.ToLower();
+
+            if (validInitialStates.Contains(startState)){
+                this.currentState = startState;
+            } else
+            {
+                throw new ArgumentException("Argument Exception: BuildingController can only be initialised to the following states 'open', 'closed', 'out of hours'");
+            }
+            
+        }
 
         public string GetBuildingID()
         {

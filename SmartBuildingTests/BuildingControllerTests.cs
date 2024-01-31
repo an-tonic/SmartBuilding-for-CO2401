@@ -12,7 +12,7 @@ namespace SmartBuildingTests
         public void L1R1_L1R2_Constructor_SetBuildingID()
         {
 
-            //Arrenge
+            //Arrange
             string newBuildingID = "test";
             var controller = new BuildingController(newBuildingID);
             
@@ -28,7 +28,7 @@ namespace SmartBuildingTests
         public void L1R3_Constructor_SetsBuildingIDToLowercase()
         {
 
-            //Arrenge
+            //Arrange
             string shouldReturnID = "test";
             var controller = new BuildingController("TEST");
 
@@ -44,7 +44,7 @@ namespace SmartBuildingTests
         public void L1R4_SetBuildingID_BuildingIDToLowercase()
         {
 
-            //Arrenge
+            //Arrange
             string shouldReturnID = "test1";
             var controller = new BuildingController("TEST");
 
@@ -61,7 +61,7 @@ namespace SmartBuildingTests
         public void L1R5_L1R6_Constructor_SetCurrentStateToOutOfHours()
         {
 
-            //Arrenge
+            //Arrange
             
             string correctState = "out_of_hours";
             var controller = new BuildingController();
@@ -81,7 +81,7 @@ namespace SmartBuildingTests
         public void L1R7_CheckValidCurrentState_ReturnTrue(string testState)
         {
 
-            //Arrenge
+            //Arrange
             var controller = new BuildingController();
 
 
@@ -99,7 +99,7 @@ namespace SmartBuildingTests
         public void L1R7_CheckInvalidCurrentState_ReturnFalse(string testState)
         {
 
-            //Arrenge
+            //Arrange
             var controller = new BuildingController();
 
 
@@ -116,7 +116,7 @@ namespace SmartBuildingTests
         public void L1R7_SetCurrentStateToValidState_ReturnTrue(string testState)
         {
 
-            //Arrenge
+            //Arrange
             var controller = new BuildingController();
 
 
@@ -130,23 +130,119 @@ namespace SmartBuildingTests
 
         [TestCase("out_of_hours")]
         [TestCase("closed")]
-        [TestCase("out_of_hours")]
         [TestCase("open")]
         [TestCase("fire_drill")]
-
-        public void L2R1_SetStatesInCorrectOrder_ReturnTrue(string testState)
+    
+        public void L2R1_SetStateToFireAlarmFromAnyState_ReturnTrue(string testState)
         {
 
-            //Arrenge
-            var controller = new BuildingController();
+            //Arrange
+            var controller = new BuildingController(testState);
 
 
             //Act
-            bool stateSetSucsessfully =  controller.SetCurrentState(testState);
+            bool stateSetSucsessfully =  controller.SetCurrentState("fire_alarm");
             
 
             //Assert
             Assert.IsTrue(stateSetSucsessfully);
+
+
+        }
+        
+        [TestCase("open")]
+        [TestCase("fire_drill")]
+        
+        public void L2R1_SetInvalidState_ReturnFalse(string testState)
+        {
+            //Arrange
+            var controller = new BuildingController();
+            controller.SetCurrentState("closed");
+
+            //Act
+            bool stateSetSucsessfully = controller.SetCurrentState(testState);
+
+            //Assert
+            Assert.IsFalse(stateSetSucsessfully);
+
+        }
+
+
+        [TestCase("out_of_hours")]
+        [TestCase("closed")]
+        [TestCase("open")]
+        [TestCase("fire_drill")]
+        [TestCase("fire_alarm")]
+        public void L2R2_SetCurrentStateToSameState_ReturnTrue(string testState)
+        {
+            //Arrange
+            var controller = new BuildingController();
+            //Needs to happen othervise would not be able to initially set fire_alarm
+            if(testState == "fire_drill")
+            {
+                controller.SetCurrentState("open");
+            }
+
+            //Act
+            controller.SetCurrentState(testState);
+            bool stateSetSucsessfully = controller.SetCurrentState(testState);
+
+            //Assert
+            Assert.IsTrue(stateSetSucsessfully);
+        }
+
+        [TestCase("out_of_hours")]
+        [TestCase("closed")]
+        [TestCase("open")]
+        [TestCase("fire_drill")]
+        [TestCase("fire_alarm")]
+        public void L2R2_SetCurrentStateToSameState_StateStaysTheSame(string testState)
+        {
+            //Arrange
+            var controller = new BuildingController();
+            //Needs to happen othervise would not be able to initially set fire_alarm
+            if (testState == "fire_drill")
+            {
+                controller.SetCurrentState("open");
+            }
+
+            //Act
+            controller.SetCurrentState(testState);
+            controller.SetCurrentState(testState);
+            bool stateSetSucsessfully = controller.GetCurrentState() == testState;
+
+            //Assert
+            Assert.IsTrue(stateSetSucsessfully);
+        }
+
+        [TestCase("oUt_of_hours")]
+        [TestCase("clOsed")]
+        [TestCase("opeN")]
+        public void L2R3_SetCurrentStateToUpperCase_SetsToLowerCase(string testState)
+        {
+            //Arrange
+            var controller = new BuildingController(buildingID: "", startState: testState);
+
+            //Act
+            string setState = controller.GetCurrentState();
+
+            //Assert
+
+            Assert.AreEqual(testState.ToLower(), setState);
+
+        }
+        [TestCase("fire_drill")]
+        [TestCase("fire_alarm")]
+        public void L2R3_SetCurrentStateToWrongState_ThrowException(string testState)
+        {
+            string correctMessage = "Argument Exception: BuildingController can only be initialised to the following states 'open', 'closed', 'out of hours'";
+
+            //Arrange & Act & Assert
+            Assert.Throws(Is.TypeOf<ArgumentException>()
+                        .And.Message.EqualTo(correctMessage),
+                        () => new BuildingController(buildingID: "", startState: testState)
+            );
+
         }
 
     }
