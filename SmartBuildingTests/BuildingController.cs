@@ -1,12 +1,19 @@
 ﻿using System.Collections.Immutable;
+using SmartBuildingTests;
 
 namespace SmartBuilding
 {
     public class BuildingController
     {
 
-        string buildingID;
-        string currentState;
+        private string buildingID;
+        private string currentState;
+        private IWebService webservice;
+        private IEmailService emailservice; 
+        private ILightManager lightManager; 
+        private IDoorManager doorManager;
+        private IFireAlarmManager fireAlarmManager;
+
         string[] validStates = { "fire_drill", "open", "out_of_hours", "closed", "fire_alarm" };
         string[] validInitialStates = { "open", "out_of_hours", "closed" };
 
@@ -27,13 +34,25 @@ namespace SmartBuilding
             this.buildingID = buildingID.ToLower();
             startState = startState.ToLower();
 
-            if (validInitialStates.Contains(startState)){
+            if (validInitialStates.Contains(startState))
+            {
                 this.currentState = startState;
-            } else
+            }
+            else
             {
                 throw new ArgumentException("Argument Exception: BuildingController can only be initialised to the following states 'open', 'closed', 'out of hours'");
             }
-            
+
+        }
+
+        BuildingController(string id, ILightManager iLightManager, IFireAlarmManager iFireAlarmManager, IDoorManager iDoorManager, IWebService iWebService, IEmailService iEmailService)
+        {
+            buildingID = id;
+            lightManager = iLightManager;
+            doorManager = iDoorManager;
+            fireAlarmManager = iFireAlarmManager;
+            webservice = iWebService;
+            emailservice = iEmailService;
         }
 
         public string GetBuildingID()
@@ -56,7 +75,7 @@ namespace SmartBuilding
             if (validStates.Contains(state))
             {
                 //fire alarm can be set from any state
-                if(state == validStates[4])
+                if (state == validStates[4])
                 {
                     currentState = state;
                     return true;
@@ -70,12 +89,12 @@ namespace SmartBuilding
                 {
                     return false;
                 }
-                
+
             }
-            
+
             return false;
-            
-            
+
+
         }
     }
 }
