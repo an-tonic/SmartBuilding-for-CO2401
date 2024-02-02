@@ -8,8 +8,8 @@ namespace SmartBuilding
 
         private string buildingID;
         private string currentState;
-        private IWebService webservice;
-        private IEmailService emailservice; 
+        private IWebService webService;
+        private IEmailService emailService; 
         private ILightManager lightManager; 
         private IDoorManager doorManager;
         private IFireAlarmManager fireAlarmManager;
@@ -45,14 +45,15 @@ namespace SmartBuilding
 
         }
 
-        BuildingController(string id, ILightManager iLightManager, IFireAlarmManager iFireAlarmManager, IDoorManager iDoorManager, IWebService iWebService, IEmailService iEmailService)
+        public BuildingController(string id, string startState, ILightManager iLightManager, IFireAlarmManager iFireAlarmManager, IDoorManager iDoorManager, IWebService iWebService, IEmailService iEmailService)
         {
             buildingID = id;
+            currentState = startState;
             lightManager = iLightManager;
             doorManager = iDoorManager;
             fireAlarmManager = iFireAlarmManager;
-            webservice = iWebService;
-            emailservice = iEmailService;
+            webService = iWebService;
+            emailService = iEmailService;
         }
 
         public string GetBuildingID()
@@ -96,5 +97,11 @@ namespace SmartBuilding
 
 
         }
+
+        public string GetCurrentReport()
+        {
+            return lightManager.GetStatus() + doorManager.GetStatus() + fireAlarmManager.GetStatus();
+        }
+
     }
 }

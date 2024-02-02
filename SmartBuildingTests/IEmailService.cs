@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SmartBuildingTests
 {
-    internal interface IEmailService
+    public interface IEmailService
     {
     }
 }

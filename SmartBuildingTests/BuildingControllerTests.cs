@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using NSubstitute;
+using NUnit.Framework;
 using SmartBuilding;
 
 
@@ -245,5 +246,38 @@ namespace SmartBuildingTests
 
         }
 
+        [TestCase("test1", "test2", "test3")]
+        [TestCase("Lights,OK,OK,FAULT,OK,OK,OK,OK,FAULT,OK,OK,",
+                "Doors,OK,OK,OK,OK,OK,OK,OK,OK,OK,OK,",
+                "FireAlarm,OK,OK,FAULT,OK,OK,OK,OK,FAULT,OK,OK,")]
+        public void L3R3_GetStatusReport_ReturnsCorrectString(string testString1, string testString2, string testString3 )
+        {
+            //Arrange
+            ILightManager lightManager = Substitute.For<ILightManager>();
+            lightManager.GetStatus().Returns(testString1);
+            IDoorManager doorManager = Substitute.For<IDoorManager>();
+            doorManager.GetStatus().Returns(testString2);
+            IFireAlarmManager fireAlarmManager = Substitute.For<IFireAlarmManager>();
+            fireAlarmManager.GetStatus().Returns(testString3);
+
+            IWebService webService = Substitute.For<IWebService>();
+            IEmailService emailService = Substitute.For<IEmailService>();
+
+            var controller = new BuildingController("", "out_of_hours", lightManager, fireAlarmManager, doorManager, webService, emailService );
+            //Act
+            var report = controller.GetCurrentReport();
+
+            //Asset
+
+            Assert.AreEqual (testString1 + testString2 + testString3, report);
+        }
+
+
+
+
     }
+
+
+
+    
 }

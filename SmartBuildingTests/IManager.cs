@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace SmartBuildingTests
 {
-    public interface IFireAlarmManager : IManager
+    public interface IManager
     {
-        public void SetAlarm(bool isActive);
+        public string GetStatus();
     }
 }
