@@ -1,5 +1,5 @@
-﻿using System.Collections.Immutable;
-using SmartBuildingTests;
+﻿using SmartBuildingTests;
+
 
 namespace SmartBuilding
 {
@@ -9,8 +9,8 @@ namespace SmartBuilding
         private string buildingID;
         private string currentState;
         private IWebService webService;
-        private IEmailService emailService; 
-        private ILightManager lightManager; 
+        private IEmailService emailService;
+        private ILightManager lightManager;
         private IDoorManager doorManager;
         private IFireAlarmManager fireAlarmManager;
 
@@ -73,62 +73,63 @@ namespace SmartBuilding
 
         public bool SetCurrentState(string state)
         {
-            if (validStates.Contains(state))
+
+            if (!validStates.Contains(state))
             {
-                //fire alarm can be set from any state
-                if (state == validStates[4])
+                return false;
+            }
+
+            //fire alarm can be set from any state
+            if (state == validStates[4])
+            {
+
+                lightManager?.SetAllLights(true);
+                doorManager?.LockAllDoors();
+                fireAlarmManager?.SetAlarm(true);
+                try
                 {
-                    if (doorManager != null && lightManager != null && fireAlarmManager != null && webService != null)
+                    webService?.LogFireAlarm("fire alarm");
+                }
+                catch (Exception e)
+                {
+                    emailService?.SendMail("smartbuilding@uclan.ac.uk", "failed to log alarm", e.Message);
+                }
+
+                currentState = state;
+                return true;
+            }
+
+
+            if (Math.Abs(Array.IndexOf(validStates, state) - Array.IndexOf(validStates, currentState)) <= 1)
+            {
+                if (doorManager != null && lightManager != null)
+                {
+
+                    if (state == validStates[1] && !doorManager.OpenAllDoors())
                     {
-                        lightManager.SetAllLights(true);
+                        return false;
+                    }
+                    if (state == validStates[3])
+                    {
+                        lightManager.SetAllLights(false);
                         doorManager.LockAllDoors();
-                        fireAlarmManager.SetAlarm(true);
-                        try
-                        {
-                            webService.LogFireAlarm("fire alarm");
-                        }
-                        catch (Exception e)
-                        {
-                            emailService.SendMail("smartbuilding@uclan.ac.uk", "failed to log alarm", e.Message);
-                        }
+                        return true;
                     }
-
-                    currentState = state;
-                    return true;
                 }
-                else if (Math.Abs(Array.IndexOf(validStates, state) - Array.IndexOf(validStates, currentState)) <= 1)
-                {
-                    if (doorManager != null && lightManager != null)
-                    {
 
-                        if (state == validStates[1] && !doorManager.OpenAllDoors())
-                        {
-                            return false;
-                        }
-                        if(state == validStates[3] )
-                        {
-                            lightManager.SetAllLights(false);
-                            doorManager.LockAllDoors();
-                            return true;
-                        }
-                    }
-                    
-                    currentState = state;
-                    
-                    return true;
-                }
-                
+                currentState = state;
 
+                return true;
             }
 
             return false;
-
-
         }
+
+
 
         public string GetCurrentReport()
         {
-            if(doorManager != null && lightManager != null && fireAlarmManager != null && webService != null)
+            if (doorManager != null && lightManager != null && fireAlarmManager != null && webService != null)
             {
                 string faultyLights = lightManager.GetStatus().Contains("FAULT") ? "Lights," : "";
                 string faultyDoors = doorManager.GetStatus().Contains("FAULT") ? "Doors," : "";

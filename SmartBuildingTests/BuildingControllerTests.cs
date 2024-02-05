@@ -36,7 +36,6 @@ namespace SmartBuildingTests
             string shouldReturnID = "test";
             var controller = new BuildingController("TEST");
 
-
             //Act
             string returnedBuildingID = controller.GetBuildingID();
 
@@ -63,7 +62,7 @@ namespace SmartBuildingTests
         }
 
         [Test]
-        //L1R5_//L1R6
+        //L1R5_L1R6
         public void L1R5_L1R6_Constructor_SetCurrentStateToOutOfHours()
         {
 
