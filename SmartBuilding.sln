@@ -6,10 +6,14 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SmartBuildingTests", "SmartBuildingTests\SmartBuildingTests.csproj", "{82DBA8E3-17DC-4AC9-8FE7-AA690C13A483}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B708FFDD-F6C9-40B2-876B-2B293ED075A3}"
+	ProjectSection(SolutionItems) = preProject
+		Program.cs = Program.cs
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{4BE935CA-4191-4AB0-9C49-4EAF2C997EFF}"
 	ProjectSection(SolutionItems) = preProject
 		CO2401 Assessmnet_Brief (2023-24).pdf = CO2401 Assessmnet_Brief (2023-24).pdf
+		CO2401-Cover Sheet and Assignment Template.docx = CO2401-Cover Sheet and Assignment Template.docx
 	EndProjectSection
 EndProject
 Global

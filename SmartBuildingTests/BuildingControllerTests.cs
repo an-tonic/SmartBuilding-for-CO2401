@@ -14,12 +14,10 @@ namespace SmartBuildingTests
         //L1R1_L1R2
         public void L1R1_L1R2_Constructor_SetBuildingID()
         {
-
             //Arrange
             string newBuildingID = "test";
             var controller = new BuildingController(newBuildingID);
             
-
             //Act
             string returnedBuildingID = controller.GetBuildingID();
 
@@ -68,9 +66,8 @@ namespace SmartBuildingTests
 
             //Arrange
             
-            string correctState = "out_of_hours";
-            var controller = new BuildingController();
-
+            string correctState = "out of hours";
+            var controller = new BuildingController(buildingID: "testID");
 
             //Act
             string returnedState = controller.GetCurrentState();
@@ -80,52 +77,30 @@ namespace SmartBuildingTests
         }
 
 
-
-        [TestCase("out_of_hours")]
+        [TestCase("out of hours")]
         [TestCase("closed")]
+        [TestCase("open")]
         //L1R7
         public void L1R7_CheckValidCurrentState_ReturnTrue(string testState)
         {
-
             //Arrange
-            var controller = new BuildingController();
-
+            var controller = new BuildingController(buildingID: "testID");
 
             //Act
             bool returnedState = controller.SetCurrentState(testState);
 
             //Assert
             Assert.IsTrue(returnedState);
-        }
+        }    
 
-
-        [TestCase("invalid")]
-        [TestCase("")]
-        //L1R7
-        public void L1R7_CheckInvalidCurrentState_ReturnFalse(string testState)
-        {
-
-            //Arrange
-            var controller = new BuildingController();
-
-
-            //Act
-            bool returnedState = controller.SetCurrentState(testState);
-
-            //Assert
-            Assert.IsFalse(returnedState);
-        }
-
-
-        [TestCase("out_of_hours")]
+        [TestCase("out of hours")]
         [TestCase("closed")]
+        [TestCase("open")]
         //L1R7
         public void L1R7_SetCurrentStateToValidState_ReturnTrue(string testState)
         {
-
             //Arrange
-            var controller = new BuildingController();
-
+            var controller = new BuildingController(buildingID: "testID");
 
             //Act
             controller.SetCurrentState(testState);
@@ -135,62 +110,129 @@ namespace SmartBuildingTests
             Assert.AreEqual(returnedState, testState);
         }
 
-        [TestCase("out_of_hours")]
+        [TestCase("invalid")]
+        [TestCase("")]
+        //L1R7
+        public void L1R7_CheckInvalidCurrentState_ReturnFalse(string testState)
+        {
+            //Arrange
+            var controller = new BuildingController(buildingID: "testID");
+
+            //Act
+            bool returnedState = controller.SetCurrentState(testState);
+
+            //Assert
+            Assert.IsFalse(returnedState);
+        }
+
+
+        [TestCase("out of hours")]
         [TestCase("closed")]
         [TestCase("open")]
-        [TestCase("fire_drill")]
         //L2R1
         public void L2R1_SetStateToFireAlarmFromAnyState_ReturnTrue(string testState)
         {
-
             //Arrange
-            var controller = new BuildingController(testState);
-
+            var controller = new BuildingController(buildingID: "testID", testState);
 
             //Act
-            bool stateSetSucsessfully =  controller.SetCurrentState("fire_alarm");
+            bool stateSetSucsessfully =  controller.SetCurrentState("fire alarm");
             
+            //Assert
+            Assert.IsTrue(stateSetSucsessfully);
+        }
+
+        [TestCase("out of hours")]
+        [TestCase("closed")]
+        [TestCase("open")]
+        //L2R1
+        public void L2R1_SetStateToFireDrillFromAnyState_ReturnTrue(string testState)
+        {
+            //Arrange
+            var controller = new BuildingController(buildingID: "testID", testState);
+
+            //Act
+            bool stateSetSucsessfully = controller.SetCurrentState("fire drill");
 
             //Assert
             Assert.IsTrue(stateSetSucsessfully);
-
-
         }
+
         
-        [TestCase("open")]
-        [TestCase("fire_drill")]
+
         //L2R1
-        public void L2R1_SetInvalidState_ReturnFalse(string testState)
+        public void L2R1_InitialStateOpenSetInvalidState_ReturnFalse()
         {
             //Arrange
-            var controller = new BuildingController();
+            var controller = new BuildingController(buildingID: "testID");
             controller.SetCurrentState("closed");
 
             //Act
-            bool stateSetSucsessfully = controller.SetCurrentState(testState);
+            bool stateSetSucsessfully = controller.SetCurrentState("open");
 
             //Assert
             Assert.IsFalse(stateSetSucsessfully);
-
         }
 
+        //L2R1
+        public void L2R1_InitialStateClosedSetInvalidState_ReturnFalse()
+        {
+            //Arrange
+            var controller = new BuildingController(buildingID: "testID");
+            controller.SetCurrentState("open");
 
-        [TestCase("out_of_hours")]
+            //Act
+            bool stateSetSucsessfully = controller.SetCurrentState("closed");
+
+            //Assert
+            Assert.IsFalse(stateSetSucsessfully);
+        }
+
+        [TestCase("out of hours")]
         [TestCase("closed")]
         [TestCase("open")]
-        [TestCase("fire_drill")]
-        [TestCase("fire_alarm")]
+        //L2R1
+        public void L2R1_SetStateToCorrectPreviousState_ReturnTrue(string testState)
+        {
+            //Arrange
+            var controller = new BuildingController(buildingID: "testID", startState: testState);
+            controller.SetCurrentState("fire drill");
+
+            //Act
+            bool stateIsPrevious = controller.SetCurrentState(testState);
+
+            //Assert
+            Assert.IsTrue(stateIsPrevious);
+        }
+
+        [TestCase("out of hours")]
+        [TestCase("closed")]
+        [TestCase("open")]
+        //L2R1
+        public void L2R1_SetStateToIncorrectPreviousState_ReturnFalse(string testState)
+        {
+            //Arrange
+            var controller = new BuildingController(buildingID: "testID", startState: testState);
+            controller.SetCurrentState("fire drill");
+
+            //Act
+            bool state = controller.SetCurrentState("open");
+
+            //Assert
+            Assert.IsTrue(state);
+        }
+
+        [TestCase("out of hours")]
+        [TestCase("closed")]
+        [TestCase("open")]
+        [TestCase("fire drill")]
+        [TestCase("fire alarm")]
         //L2R2
         public void L2R2_SetCurrentStateToSameState_ReturnTrue(string testState)
         {
             //Arrange
-            var controller = new BuildingController();
-            //Needs to happen othervise would not be able to initially set fire_alarm
-            if(testState == "fire_drill")
-            {
-                controller.SetCurrentState("open");
-            }
-
+            var controller = new BuildingController(buildingID: "testID");
+            
             //Act
             controller.SetCurrentState(testState);
             bool stateSetSucsessfully = controller.SetCurrentState(testState);
@@ -199,21 +241,16 @@ namespace SmartBuildingTests
             Assert.IsTrue(stateSetSucsessfully);
         }
 
-        [TestCase("out_of_hours")]
+        [TestCase("out of hours")]
         [TestCase("closed")]
         [TestCase("open")]
-        [TestCase("fire_drill")]
-        [TestCase("fire_alarm")]
+        [TestCase("fire drill")]
+        [TestCase("fire alarm")]
         //L2R2
         public void L2R2_SetCurrentStateToSameState_StateStaysTheSame(string testState)
         {
             //Arrange
-            var controller = new BuildingController();
-            //Needs to happen othervise would not be able to initially set fire_alarm
-            if (testState == "fire_drill")
-            {
-                controller.SetCurrentState("open");
-            }
+            var controller = new BuildingController(buildingID: "testID");
 
             //Act
             controller.SetCurrentState(testState);
@@ -224,14 +261,14 @@ namespace SmartBuildingTests
             Assert.IsTrue(stateSetSucsessfully);
         }
 
-        [TestCase("oUt_of_hours")]
+        [TestCase("out of hours")]
         [TestCase("clOsed")]
         [TestCase("opeN")]
         //L2R3
         public void L2R3_SetCurrentStateToUpperCase_SetsToLowerCase(string testState)
         {
             //Arrange
-            var controller = new BuildingController(buildingID: "", startState: testState);
+            var controller = new BuildingController(buildingID: "testID", startState: testState);
 
             //Act
             string setState = controller.GetCurrentState();
@@ -241,8 +278,8 @@ namespace SmartBuildingTests
             Assert.AreEqual(testState.ToLower(), setState);
 
         }
-        [TestCase("fire_drill")]
-        [TestCase("fire_alarm")]
+        [TestCase("fire drill")]
+        [TestCase("fire alarm")]
         //L2R3
         public void L2R3_SetCurrentStateToWrongState_ThrowException(string testState)
         {
@@ -251,7 +288,7 @@ namespace SmartBuildingTests
             //Arrange & Act & Assert
             Assert.Throws(Is.TypeOf<ArgumentException>()
                         .And.Message.EqualTo(correctMessage),
-                        () => new BuildingController(buildingID: "", startState: testState)
+                        () => new BuildingController(buildingID: "testID", startState: testState)
             );
 
         }
@@ -274,12 +311,11 @@ namespace SmartBuildingTests
             IWebService webService = Substitute.For<IWebService>();
             IEmailService emailService = Substitute.For<IEmailService>();
 
-            var controller = new BuildingController("", "out_of_hours", lightManager, fireAlarmManager, doorManager, webService, emailService );
+            var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService );
             //Act
             var report = controller.GetCurrentReport();
 
             //Asset
-
             Assert.AreEqual (testString1 + testString2 + testString3, report);
         }
 
@@ -294,7 +330,7 @@ namespace SmartBuildingTests
             IWebService webService = Substitute.For<IWebService>();
             IEmailService emailService = Substitute.For<IEmailService>();
 
-            var controller = new BuildingController("", "out_of_hours", lightManager, fireAlarmManager, doorManager, webService, emailService);
+            var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService);
             //Act
             controller.SetCurrentState("open");
 
@@ -314,7 +350,7 @@ namespace SmartBuildingTests
             IWebService webService = Substitute.For<IWebService>();
             IEmailService emailService = Substitute.For<IEmailService>();
 
-            var controller = new BuildingController("", "out_of_hours", lightManager, fireAlarmManager, doorManager, webService, emailService);
+            var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService);
             //Act
             var result = controller.SetCurrentState("open");
 
@@ -330,17 +366,18 @@ namespace SmartBuildingTests
             ILightManager lightManager = Substitute.For<ILightManager>();
             IDoorManager doorManager = Substitute.For<IDoorManager>();
             doorManager.OpenAllDoors().Returns(false);
+
             IFireAlarmManager fireAlarmManager = Substitute.For<IFireAlarmManager>();
             IWebService webService = Substitute.For<IWebService>();
             IEmailService emailService = Substitute.For<IEmailService>();
 
-            var controller = new BuildingController("", "out_of_hours", lightManager, fireAlarmManager, doorManager, webService, emailService);
+            var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService);
             //Act
             controller.SetCurrentState("open");
             var result = controller.GetCurrentState();
 
             //Assert
-            Assert.AreEqual(result, "out_of_hours");
+            Assert.AreEqual(result, "out of hours");
         }
         [Test]
         //L3R5
@@ -354,7 +391,7 @@ namespace SmartBuildingTests
             IWebService webService = Substitute.For<IWebService>();
             IEmailService emailService = Substitute.For<IEmailService>();
 
-            var controller = new BuildingController("", "out_of_hours", lightManager, fireAlarmManager, doorManager, webService, emailService);
+            var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService);
             //Act
             controller.SetCurrentState("open");
             var result = controller.GetCurrentState();
@@ -374,7 +411,7 @@ namespace SmartBuildingTests
             IWebService webService = Substitute.For<IWebService>();
             IEmailService emailService = Substitute.For<IEmailService>();
 
-            var controller = new BuildingController("", "out_of_hours", lightManager, fireAlarmManager, doorManager, webService, emailService);
+            var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService);
             //Act
             controller.SetCurrentState("closed");
 
@@ -395,9 +432,9 @@ namespace SmartBuildingTests
             IWebService webService = Substitute.For<IWebService>();
             IEmailService emailService = Substitute.For<IEmailService>();
 
-            var controller = new BuildingController("", "out_of_hours", lightManager, fireAlarmManager, doorManager, webService, emailService);
+            var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService);
             //Act
-            controller.SetCurrentState("fire_alarm");
+            controller.SetCurrentState("fire alarm");
 
             //Assert
             doorManager.Received().LockAllDoors();
@@ -423,7 +460,7 @@ namespace SmartBuildingTests
             fireAlarmManager.GetStatus().Returns(testString3);
             IWebService webService = Substitute.For<IWebService>();
             IEmailService emailService = Substitute.For<IEmailService>();
-            var controller = new BuildingController("", "out_of_hours", lightManager, fireAlarmManager, doorManager, webService, emailService);
+            var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService);
             //Act
             controller.GetCurrentReport();
 
@@ -445,9 +482,9 @@ namespace SmartBuildingTests
             webService.When(x => x.LogFireAlarm(Arg.Any<string>()))
                       .Do(x => { throw new Exception("fake exception"); });
 
-            var controller = new BuildingController("", "out_of_hours", lightManager, fireAlarmManager, doorManager, webService, emailService);
+            var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService);
             //Act
-            controller.SetCurrentState("fire_alarm");
+            controller.SetCurrentState("fire alarm");
 
             //Assert
             emailService.Received().SendMail("smartbuilding@uclan.ac.uk", "failed to log alarm", "fake exception");

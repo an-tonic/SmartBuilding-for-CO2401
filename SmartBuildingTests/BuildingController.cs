@@ -8,25 +8,21 @@ namespace SmartBuilding
 
         private string buildingID;
         private string currentState;
-        private IWebService webService;
-        private IEmailService emailService;
-        private ILightManager lightManager;
-        private IDoorManager doorManager;
-        private IFireAlarmManager fireAlarmManager;
+        private string? previousState;
+        private IWebService? webService;
+        private IEmailService? emailService;
+        private ILightManager? lightManager;
+        private IDoorManager? doorManager;
+        private IFireAlarmManager? fireAlarmManager;
 
-        string[] validStates = { "fire_drill", "open", "out_of_hours", "closed", "fire_alarm" };
-        string[] validInitialStates = { "open", "out_of_hours", "closed" };
-
-        public BuildingController()
-        {
-            this.buildingID = "";
-            this.currentState = "out_of_hours";
-        }
+        string[] validInitialStates = { "fire drill", "open", "out of hours", "closed", "fire alarm" };
+        string[] validStates = { "open", "out of hours", "closed" };
+    
 
         public BuildingController(string buildingID)
         {
             this.buildingID = buildingID.ToLower();
-            this.currentState = "out_of_hours";
+            this.currentState = "out of hours";
         }
 
         public BuildingController(string buildingID, string startState)
@@ -34,7 +30,7 @@ namespace SmartBuilding
             this.buildingID = buildingID.ToLower();
             startState = startState.ToLower();
 
-            if (validInitialStates.Contains(startState))
+            if (validStates.Contains(startState))
             {
                 this.currentState = startState;
             }
@@ -45,10 +41,10 @@ namespace SmartBuilding
 
         }
 
-        public BuildingController(string id, string startState, ILightManager iLightManager, IFireAlarmManager iFireAlarmManager, IDoorManager iDoorManager, IWebService iWebService, IEmailService iEmailService)
+        public BuildingController(string id,  ILightManager iLightManager, IFireAlarmManager iFireAlarmManager, IDoorManager iDoorManager, IWebService iWebService, IEmailService iEmailService)
         {
-            buildingID = id;
-            currentState = startState;
+            buildingID = id.ToLower();
+            currentState = "out of hours";
             lightManager = iLightManager;
             doorManager = iDoorManager;
             fireAlarmManager = iFireAlarmManager;
@@ -74,13 +70,13 @@ namespace SmartBuilding
         public bool SetCurrentState(string state)
         {
 
-            if (!validStates.Contains(state))
+            if (!validInitialStates.Contains(state))
             {
                 return false;
             }
-
-            //fire alarm can be set from any state
-            if (state == validStates[4])
+            
+            //set fire alarm
+            if (state == validInitialStates[4])
             {
 
                 lightManager?.SetAllLights(true);
@@ -94,22 +90,41 @@ namespace SmartBuilding
                 {
                     emailService?.SendMail("smartbuilding@uclan.ac.uk", "failed to log alarm", e.Message);
                 }
-
+                previousState = currentState;
+                currentState = state;
+                return true;
+            }
+            //set fire drill
+            if(state == validInitialStates[0])
+            {   
+                previousState = currentState;
                 currentState = state;
                 return true;
             }
 
+            //returning to previous state from drill
+            if(currentState == "fire drill" && state == previousState)
+            {
+                currentState = state;
+                return true;
+            }
+            //returning to previous state from alarm
+            if (currentState == "fire alarm" && state == previousState)
+            {
+                currentState = state;
+                return true;
+            }
 
-            if (Math.Abs(Array.IndexOf(validStates, state) - Array.IndexOf(validStates, currentState)) <= 1)
+            if (Math.Abs(Array.IndexOf(validInitialStates, state) - Array.IndexOf(validInitialStates, currentState)) <= 1)
             {
                 if (doorManager != null && lightManager != null)
                 {
 
-                    if (state == validStates[1] && !doorManager.OpenAllDoors())
+                    if (state == validInitialStates[1] && !doorManager.OpenAllDoors())
                     {
                         return false;
                     }
-                    if (state == validStates[3])
+                    if (state == validInitialStates[3])
                     {
                         lightManager.SetAllLights(false);
                         doorManager.LockAllDoors();
@@ -117,14 +132,13 @@ namespace SmartBuilding
                     }
                 }
 
+                
                 currentState = state;
-
                 return true;
             }
 
             return false;
         }
-
 
 
         public string GetCurrentReport()
