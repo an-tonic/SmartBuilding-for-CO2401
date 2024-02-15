@@ -25,6 +25,8 @@ namespace SmartBuilding
             this.currentState = "out of hours";
         }
 
+        
+
         public BuildingController(string buildingID, string startState)
         {
             this.buildingID = buildingID.ToLower();
@@ -51,6 +53,7 @@ namespace SmartBuilding
             webService = iWebService;
             emailService = iEmailService;
         }
+
 
         public string GetBuildingID()
         {

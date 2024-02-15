@@ -261,7 +261,7 @@ namespace SmartBuildingTests
             Assert.IsTrue(stateSetSucsessfully);
         }
 
-        [TestCase("out of hours")]
+        [TestCase("out of hoUrs")]
         [TestCase("clOsed")]
         [TestCase("opeN")]
         //L2R3
