@@ -26,7 +26,6 @@ namespace SmartBuilding
         }
 
         
-
         public BuildingController(string buildingID, string startState)
         {
             this.buildingID = buildingID.ToLower();
@@ -77,7 +76,19 @@ namespace SmartBuilding
             {
                 return false;
             }
-            
+
+            //returning to previous state from drill or alarm
+            if (currentState == "fire drill" || currentState == "fire alarm")
+            {
+                if(state == previousState || state == currentState)
+                {
+                    currentState = state;
+                    return true;
+                }
+                return false;
+            }
+
+
             //set fire alarm
             if (state == validInitialStates[4])
             {
@@ -97,6 +108,7 @@ namespace SmartBuilding
                 currentState = state;
                 return true;
             }
+
             //set fire drill
             if(state == validInitialStates[0])
             {   
@@ -105,28 +117,18 @@ namespace SmartBuilding
                 return true;
             }
 
-            //returning to previous state from drill
-            if(currentState == "fire drill" && state == previousState)
-            {
-                currentState = state;
-                return true;
-            }
-            //returning to previous state from alarm
-            if (currentState == "fire alarm" && state == previousState)
-            {
-                currentState = state;
-                return true;
-            }
-
+   
+            //set regular state, i.e. close, open, out of hours
             if (Math.Abs(Array.IndexOf(validInitialStates, state) - Array.IndexOf(validInitialStates, currentState)) <= 1)
             {
                 if (doorManager != null && lightManager != null)
                 {
-
+                    //State sets to open, but the doors fail to open
                     if (state == validInitialStates[1] && !doorManager.OpenAllDoors())
                     {
                         return false;
                     }
+                    //open state
                     if (state == validInitialStates[3])
                     {
                         lightManager.SetAllLights(false);

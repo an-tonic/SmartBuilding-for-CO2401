@@ -158,8 +158,7 @@ namespace SmartBuildingTests
             Assert.IsTrue(stateSetSucsessfully);
         }
 
-        
-
+        [Test]
         //L2R1
         public void L2R1_InitialStateOpenSetInvalidState_ReturnFalse()
         {
@@ -174,6 +173,7 @@ namespace SmartBuildingTests
             Assert.IsFalse(stateSetSucsessfully);
         }
 
+        [Test]
         //L2R1
         public void L2R1_InitialStateClosedSetInvalidState_ReturnFalse()
         {
@@ -207,7 +207,6 @@ namespace SmartBuildingTests
 
         [TestCase("out of hours")]
         [TestCase("closed")]
-        [TestCase("open")]
         //L2R1
         public void L2R1_SetStateToIncorrectPreviousState_ReturnFalse(string testState)
         {
@@ -219,7 +218,37 @@ namespace SmartBuildingTests
             bool state = controller.SetCurrentState("open");
 
             //Assert
-            Assert.IsTrue(state);
+            Assert.IsFalse(state);
+        }
+
+        [Test]
+        //L2R1
+        public void L2R1_SetStateToFireAlarmAndThenFireDrill_ReturnFalse()
+        {
+            //Arrange
+            var controller = new BuildingController(buildingID: "testID");
+            controller.SetCurrentState("fire alarm");
+
+            //Act
+            bool state = controller.SetCurrentState("fire drill");
+
+            //Assert
+            Assert.IsFalse(state);
+        }
+
+        [Test]
+        //L2R1
+        public void L2R1_SetStateToFireDrillAndThenFireAlarm_ReturnFalse()
+        {
+            //Arrange
+            var controller = new BuildingController(buildingID: "testID");
+            controller.SetCurrentState("fire drill");
+
+            //Act
+            bool state = controller.SetCurrentState("fire alarm");
+
+            //Assert
+            Assert.IsFalse(state);
         }
 
         [TestCase("out of hours")]
@@ -461,11 +490,11 @@ namespace SmartBuildingTests
             IWebService webService = Substitute.For<IWebService>();
             IEmailService emailService = Substitute.For<IEmailService>();
             var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService);
+            
             //Act
             controller.GetCurrentReport();
 
             //Assert
-         
             webService.Received().LogEngineerRequired(result);
         }
 
