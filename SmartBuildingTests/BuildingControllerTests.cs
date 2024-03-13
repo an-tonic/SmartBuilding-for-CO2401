@@ -1,8 +1,6 @@
 ﻿using NSubstitute;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using SmartBuilding;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SmartBuildingTests
 {

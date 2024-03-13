@@ -1,9 +1,4 @@
-﻿
-using SmartBuildingTests;
-using System;
-
-
-namespace SmartBuilding
+﻿namespace SmartBuilding
 {
     class Program
     {

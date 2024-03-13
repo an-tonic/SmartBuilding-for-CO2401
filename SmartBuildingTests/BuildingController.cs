@@ -119,6 +119,7 @@ namespace SmartBuilding
 
    
             //set regular state, i.e. close, open, out of hours
+            //works by checking of the new state is 'next' to the current state in terms of 
             if (Math.Abs(Array.IndexOf(validInitialStates, state) - Array.IndexOf(validInitialStates, currentState)) <= 1)
             {
                 if (doorManager != null && lightManager != null)
