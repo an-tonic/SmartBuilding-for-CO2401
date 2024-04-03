@@ -94,7 +94,7 @@ namespace SmartBuilding
             {
 
                 lightManager?.SetAllLights(true);
-                doorManager?.LockAllDoors();
+                doorManager?.OpenAllDoors();
                 fireAlarmManager?.SetAlarm(true);
                 try
                 {
@@ -134,6 +134,7 @@ namespace SmartBuilding
                     {
                         lightManager.SetAllLights(false);
                         doorManager.LockAllDoors();
+                        currentState = state;
                         return true;
                     }
                 }
@@ -147,14 +148,18 @@ namespace SmartBuilding
         }
 
 
-        public string GetCurrentReport()
+        public string GetStatusReport()
         {
             if (doorManager != null && lightManager != null && fireAlarmManager != null && webService != null)
             {
                 string faultyLights = lightManager.GetStatus().Contains("FAULT") ? "Lights," : "";
                 string faultyDoors = doorManager.GetStatus().Contains("FAULT") ? "Doors," : "";
                 string faultyFireAlarm = fireAlarmManager.GetStatus().Contains("FAULT") ? "FireAlarm," : "";
-                webService.LogEngineerRequired(faultyLights + faultyDoors + faultyFireAlarm);
+                if(faultyLights != "" || faultyDoors != "" || faultyFireAlarm != "")
+                {
+                    webService.LogEngineerRequired(faultyLights + faultyDoors + faultyFireAlarm);
+                }
+                
                 return lightManager.GetStatus() + doorManager.GetStatus() + fireAlarmManager.GetStatus();
             }
             return "";

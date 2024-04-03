@@ -340,7 +340,7 @@ namespace SmartBuildingTests
 
             var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService );
             //Act
-            var report = controller.GetCurrentReport();
+            var report = controller.GetStatusReport();
 
             //Asset
             Assert.AreEqual (testString1 + testString2 + testString3, report);
@@ -429,7 +429,7 @@ namespace SmartBuildingTests
 
         [Test]
         //L4R1
-        public void L4R1_SetStatusToClosed_OpenAllDoorsAndSetAllLIghtMethodsAreCalled()
+        public void L4R1_SetStatusToClosed_LockAllDoorsAndSetAllLIghtMethodsAreCalled()
         {
             //Arrange
             ILightManager lightManager = Substitute.For<ILightManager>();
@@ -464,7 +464,7 @@ namespace SmartBuildingTests
             controller.SetCurrentState("fire alarm");
 
             //Assert
-            doorManager.Received().LockAllDoors();
+            doorManager.Received().OpenAllDoors();
             lightManager.Received().SetAllLights(true);
             fireAlarmManager.Received().SetAlarm(true);
             webService.Received().LogFireAlarm("fire alarm");
@@ -490,7 +490,7 @@ namespace SmartBuildingTests
             var controller = new BuildingController("testID", lightManager, fireAlarmManager, doorManager, webService, emailService);
             
             //Act
-            controller.GetCurrentReport();
+            controller.GetStatusReport();
 
             //Assert
             webService.Received().LogEngineerRequired(result);
@@ -516,6 +516,8 @@ namespace SmartBuildingTests
             //Assert
             emailService.Received().SendMail("smartbuilding@uclan.ac.uk", "failed to log alarm", "fake exception");
         }
+
+
 
     }
 
